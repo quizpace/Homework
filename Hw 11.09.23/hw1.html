@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="Car.js"></script>
+    <title>Cars</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #aabee6;
+            border-radius: 90px;
+            padding: 40px;
+            box-shadow: 0 8px 18px rgba(68, 6, 224, 0.2);
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #08325a;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+            
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #44b6c8;
+            border-radius: 5px;
+            position: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        input[type="text"]::placeholder {
+            color: #999999;
+        }
+
+        button {
+            background-color: #0b2a4b;
+            color: #fff;
+            border: none;
+            margin: 30px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #imageContainer {
+            margin-top: 20px;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Add Car</h1>
+
+        <label for="brand">Brand:</label>
+        <input type="text" id="brand" name="brand">
+
+        <label for="model">Model:</label>
+        <input type="text" id="model" name="model">
+
+        <label for="year">Year:</label>
+        <input type="text" id="year" name="year">
+
+        <label for="color">Color:</label>
+        <input type="text" id="color" placeholder="">
+
+        <label for="km">KM:</label>
+        <input type="text" id="km" name="km">
+
+        <div id="imageContainer">
+
+    </div>
+
+    <div id="carDetails">
+
+    </div>
+
+    <script>
+
+
+let currentImage = null;
+
+
+    const car = new Car();
+
+
+    function displayCarDetails() {
+        const carDetailsDiv = document.getElementById('carDetails');
+        carDetailsDiv.innerHTML = `
+            <h2>Car Details</h2>
+            <p><strong>Brand:</strong> ${car.brand}</p>
+            <p><strong>Model:</strong> ${car.model}</p>
+            <p><strong>Year:</strong> ${car.year}</p>
+            <p><strong>Color:</strong> ${car.color}</p>
+            <p><strong>Kilometers:</strong> ${car.km}</p>
+        `;
+    }
+
+
+document.getElementById('brand').addEventListener('input', performAutomaticSearch);
+document.getElementById('model').addEventListener('input', performAutomaticSearch);
+document.getElementById('year').addEventListener('input', performAutomaticSearch);
+document.getElementById('color').addEventListener('input', performAutomaticSearch);
+document.getElementById('km').addEventListener('input', performAutomaticSearch);
+
+
+let searchTimeout;
+
+function performAutomaticSearch() {
+    const brand = document.getElementById('brand').value;
+    const model = document.getElementById('model').value;
+    const year = document.getElementById('year').value;
+    const color = document.getElementById('color').value;
+    const km = document.getElementById('km').value;
+
+    car.updateBrand(brand);
+    car.updateModel(model);
+    car.updateYear(year);
+    car.updateColor(color);
+    car.updateKm(km);
+
+    displayCarDetails();
+
+    clearTimeout(searchTimeout);
+
+    searchTimeout = setTimeout(() => {
+        if (color) {
+            searchForCarImage(color);
+        }
+    }, 1000);
+}
+
+
+function searchForCarImage(color) {
+
+    const apiKey = 'PFXbUnHYlFjH6EhJEumBv4hA-F-05NOvuimnPZixTmc';
+    const apiUrl = `https://api.unsplash.com/search/photos?query=car ${color}&client_id=${apiKey}`;
+    
+    // Clear previous images
+    const imageContainer = document.getElementById('imageContainer');
+    imageContainer.innerHTML = '';
+    
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            if (data.results.length > 0) {
+                const img = document.createElement('img');
+                img.src = data.results[0].urls.small;
+                img.alt = 'Car Image';
+                imageContainer.appendChild(img);
+
+                // Store the current image in the global variable
+                currentImage = img;
+            } else {
+                // Handle the case when no images are found
+                imageContainer.innerHTML = 'No images found.';
+                currentImage = null;
+            }
+        })
+        .catch(error => console.error(error));
+}
+
+    </script>
+</body>
+</html>

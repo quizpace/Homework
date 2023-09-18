@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>REST Countries</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      #container {
+        text-align: center;
+        padding: 20px;
+      }
+      h1 {
+        margin-bottom: 20px;
+        animation: coolTextAnimation 2s ease-in-out infinite alternate;
+      }
+
+      @keyframes coolTextAnimation {
+        0% {
+          transform: scale(1);
+        }
+        100% {
+          transform: scale(1.2);
+        }
+      }
+
+      select {
+        padding: 10px;
+      }
+      button {
+        padding: 10px 20px;
+        background-color: #4a0870;
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 10%;
+      }
+      button:hover {
+        background-color: #9e00b3;
+      }
+      #results {
+        margin-top: 20px;
+      }
+      img {
+        max-width: 100px;
+        max-height: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <h1>חיפוש לפי סוגי מטבעות</h1>
+      <select id="currency">
+        <option value="USD">USD - דולר אמריקני</option>
+        <option value="CHF">CHF - פרנק שווייצרי</option>
+        <option value="EUR">EUR - יורו</option>
+        <option value="GBP">GBP - לירה שטרלינג בריטית</option>
+        <option value="JPY">JPY - ין יפני</option>
+        <option value="AUD">AUD - דולר אוסטרלי</option>
+        <option value="CAD">CAD - דולר קנדי</option>
+        <option value="CNY">CNY - יואן סיני</option>
+        <option value="INR">INR - רופי הודי</option>
+        <option value="RUB">RUB - רובל רוסי</option>
+        <option value="BRL">BRL - ריאל ברזילאי</option>
+        <option value="ZAR">ZAR - רנד דרום אפריקאי</option>
+        <option value="ILS">ILS - שקל ישראלי</option>
+      </select>
+      <button onclick="searchByCurrency()">חפש</button>
+
+      <div id="results"></div>
+      <img id="countryFlag" alt="דגל מדינה" />
+    </div>
+
+    <script>
+      function searchByCurrency() {
+        const currencyCode = document.getElementById("currency").value;
+        const apiUrl = `https://restcountries.com/v3.1/currency/${currencyCode}`;
+
+        fetch(apiUrl)
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.length > 0) {
+              const resultsDiv = document.getElementById("results");
+              resultsDiv.innerHTML = "<h2>תוצאות:</h2>";
+
+              data.forEach((country) => {
+                resultsDiv.innerHTML += `
+                        <p>שם מדינה: ${country.name.common}</p>
+                        <p>שם המטבע: ${
+                          country.currencies[currencyCode].name
+                        }</p>
+<p>שפה מדוברת: ${
+                  country.languages && country.languages.length > 0
+                    ? country.languages[0].name
+                    : "N/A"
+                }</p>
+                        <img src="${country.flags.png}" alt="דגל מדינה">
+                        <hr> <!-- הפרדה בין מדינות -->
+                    `;
+              });
+            }
+          })
+          .catch((error) => console.error("שגיאה", error));
+      }
+    </script>
+  </body>
+</html>
